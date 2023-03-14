@@ -9,82 +9,149 @@ import Layout from '../layouts/Layout.astro';
 </Layout>
 <script>
 
-    import perlin from 'perlin-noise';
+    //import perlin from 'perlin-noise';
+    import {createNoise2D} from 'simplex-noise';
 
-    let y = 20;
-    let x = 20;
+    const noise2D = createNoise2D();
+
+    let y = 400;
+    let x = 400;
+
+    let playerWorldPos = [20, 20];
 
     let height = 800/20;
     let width = 800/20;
 
-    let world = perlin.generatePerlinNoise(width, height); // [...Array(height)].map(e=>Array(width));
+    let world = new Array(height);
+    for(let i = 0; i < world.length; i++){
+       world[i] = new Array(width); 
+    }
 
-    console.log(world);
+    console.log(world)
+
     for(let i = 0; i < height; i++){
         for(let j = 0; j < width; j++){
             let rx = i/width - 0.5;
             let ry = j/height - 0.5;
-            //world[i, j] = noise(480, 480);
+            let e = (noise2D(rx, ry)/2 + 0.5);
+            let m = (noise2D(rx, ry)/2 + 0.5)
+            world[i][j] = {e, m};
         }
     }
+    console.log(world);
 
-    let green = '#81a358';
+    let grass = '#81a358';
+    let forest = '#476b3f';
+    
     let brown = '#a6745b';
-    let gray = '#909190';
-    let blue = '#87b5ff';
+    
+    let rock = '#909190';
+    
+    let ocean = '#87b5ff';
+    
     let desert = '#fadfa5';
 
     let c: HTMLCanvasElement = document.getElementById('game');
     let ctx: CanvasRenderingContext2D = c.getContext("2d")!;
 
-    function clear(){
-        for(let i = 0; i < 40; i++){
-            for(let j = 0; j < 40; j++){
+    function map(){
+        for(let i = 0; i < height; i++){
+            for(let j = 0; j < width; j++){
 
-                if(world[i*j] < 0.2)
-                    ctx.fillStyle = blue; 
-                if(world[i*j] >= 0.2)
-                    ctx.fillStyle = green; 
-                if(world[i*j] > 0.5 && world[i*j] < 0.55)
+                if(world[i][j].e < 0.1)
+                    ctx.fillStyle = ocean; 
+                if(world[i][j].e > 0.1)
+                    ctx.fillStyle = forest; 
+                    if(world[i][j].m > 0.3)
+                        ctx.fillStyle = grass; 
+                if(world[i][j].e > 0.5)
                     ctx.fillStyle = desert;
-                if(world[i*j] >= 0.7) 
-                    ctx.fillStyle = gray; 
+                if(world[i][j].e > 0.7) 
+                    ctx.fillStyle = rock; 
+                if(world[i][j].e > 0.9) 
+                    ctx.fillStyle = '#ffffff'; 
+                if(playerWorldPos[0] == i && playerWorldPos[1] == j){
+                    ctx.fillStyle = '#ff0022'
 
-                ctx.fillRect(i*20, j*20, 20, 20);
+                }
+                ctx.fillRect(i*4, j*4, 4, 4);
             }
         }
+    }
+    function renderWorld(){
+        loop:
+        for(let i = 0; i < height; i++){
+            for(let j = 0; j < width; j++){
+
+                if(world[i][j].e < 0.1)
+                    ctx.fillStyle = ocean; 
+                if(world[i][j].e > 0.1)
+                    ctx.fillStyle = forest; 
+                    if(world[i][j].m > 0.3)
+                        ctx.fillStyle = grass; 
+                if(world[i][j].e > 0.5)
+                    ctx.fillStyle = desert;
+                if(world[i][j].e > 0.7) 
+                    ctx.fillStyle = rock; 
+                if(world[i][j].e > 0.9) 
+                    ctx.fillStyle = '#ffffff'; 
+
+                if(playerWorldPos[0] == i && playerWorldPos[1] == j)
+                    break loop;
+            }
+        }
+        ctx.fillRect(0, 0, 800, 800);
+        
     }
     function renderChar(){
         ctx.fillStyle = brown;
         ctx.fillRect(x, y, 20, 20);
     } 
-    clear();
+
+    renderWorld();
     renderChar();
+    map();
 
     addEventListener("keydown",(e) => {
         if(e.code === 'ArrowUp'){
             y = y-20;
-            if(y < 0) y = 0;
-            clear();
+            if(y < 0){
+                y = 780;
+                playerWorldPos[1] -= 1;
+            }
+            renderWorld();
             renderChar();
+            map();
         }
         if(e.code === 'ArrowDown'){
             y = y+20;
-            if(y > 780) y = 780; 
-            clear();
+            if(y > 780){
+                y = 0; 
+                playerWorldPos[1] += 1;
+            }
+            renderWorld();
             renderChar();
+            map();
         }
         if(e.code === 'ArrowLeft'){
             x = x-20;
-            if(x < 0) x = 0;
-            clear();
+            if(x < 0){
+                x = 780;
+                playerWorldPos[0] -= 1;
+            }
+            renderWorld();
             renderChar();
+            map();
         }
         if(e.code === 'ArrowRight'){
             x = x+20;
-            if(x > 780) x = 780;
-            clear();
+            if(x > 780){
+                x = 0;
+                playerWorldPos[0] += 1;
+            }
+            renderWorld();
             renderChar();
+            map();
         }
     });
 
