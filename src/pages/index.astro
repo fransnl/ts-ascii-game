@@ -3,17 +3,36 @@ import Layout from '../layouts/Layout.astro';
 ---
 
 <Layout title="Welcome to Astro.">
-	<main>
+	<main class="w-screen h-screen flex items-center justify-center">
         <canvas id="game" width="800" height="800"/>
 	</main>
 </Layout>
 <script>
 
+    import perlin from 'perlin-noise';
+
     let y = 20;
     let x = 20;
 
+    let height = 800/20;
+    let width = 800/20;
+
+    let world = perlin.generatePerlinNoise(width, height); // [...Array(height)].map(e=>Array(width));
+
+    console.log(world);
+    for(let i = 0; i < height; i++){
+        for(let j = 0; j < width; j++){
+            let rx = i/width - 0.5;
+            let ry = j/height - 0.5;
+            //world[i, j] = noise(480, 480);
+        }
+    }
+
     let green = '#81a358';
     let brown = '#a6745b';
+    let gray = '#909190';
+    let blue = '#87b5ff';
+    let desert = '#fadfa5';
 
     let c: HTMLCanvasElement = document.getElementById('game');
     let ctx: CanvasRenderingContext2D = c.getContext("2d")!;
@@ -21,7 +40,16 @@ import Layout from '../layouts/Layout.astro';
     function clear(){
         for(let i = 0; i < 40; i++){
             for(let j = 0; j < 40; j++){
-                ctx.fillStyle = green; 
+
+                if(world[i*j] < 0.2)
+                    ctx.fillStyle = blue; 
+                if(world[i*j] >= 0.2)
+                    ctx.fillStyle = green; 
+                if(world[i*j] > 0.5 && world[i*j] < 0.55)
+                    ctx.fillStyle = desert;
+                if(world[i*j] >= 0.7) 
+                    ctx.fillStyle = gray; 
+
                 ctx.fillRect(i*20, j*20, 20, 20);
             }
         }
