@@ -11,8 +11,10 @@ import Layout from '../layouts/Layout.astro';
 
     //import perlin from 'perlin-noise';
     import {createNoise2D} from 'simplex-noise';
+    import {player, updatePos, updateWorldPos} from '../player';
 
     const noise2D = createNoise2D();
+    const mainPlayer = player(400, 400, [20, 20]);
 
     let y = 400;
     let x = 400;
@@ -105,7 +107,7 @@ import Layout from '../layouts/Layout.astro';
     }
     function renderChar(){
         ctx.fillStyle = brown;
-        ctx.fillRect(x, y, 20, 20);
+        ctx.fillRect(mainPlayer.x, mainPlayer.y, mainPlayer.playerWorldPos[0], mainPlayer.playerWorldPos[1]);
     } 
 
     renderWorld();
@@ -114,9 +116,9 @@ import Layout from '../layouts/Layout.astro';
 
     addEventListener("keydown",(e) => {
         if(e.code === 'ArrowUp'){
-            y = y-20;
-            if(y < 0){
-                y = 780;
+            updatePos(mainPlayer, mainPlayer.x, mainPlayer.y - 20)
+            if(mainPlayer.y < 0){
+                updatePos(mainPlayer, mainPlayer.x, 780);
                 playerWorldPos[1] -= 1;
             }
             renderWorld();
@@ -124,9 +126,9 @@ import Layout from '../layouts/Layout.astro';
             map();
         }
         if(e.code === 'ArrowDown'){
-            y = y+20;
-            if(y > 780){
-                y = 0; 
+            updatePos(mainPlayer, mainPlayer.x, mainPlayer.y + 20);
+            if(mainPlayer.y > 780){
+                updatePos(mainPlayer, mainPlayer.x, 0);
                 playerWorldPos[1] += 1;
             }
             renderWorld();
@@ -134,9 +136,9 @@ import Layout from '../layouts/Layout.astro';
             map();
         }
         if(e.code === 'ArrowLeft'){
-            x = x-20;
-            if(x < 0){
-                x = 780;
+            updatePos(mainPlayer, mainPlayer.x - 20, mainPlayer.y);
+            if(mainPlayer.x < 0){
+                updatePos(mainPlayer, 780, mainPlayer.y);
                 playerWorldPos[0] -= 1;
             }
             renderWorld();
@@ -144,9 +146,9 @@ import Layout from '../layouts/Layout.astro';
             map();
         }
         if(e.code === 'ArrowRight'){
-            x = x+20;
-            if(x > 780){
-                x = 0;
+            updatePos(mainPlayer, mainPlayer.x + 20, mainPlayer.y);
+            if(mainPlayer.x > 780){
+                updatePos(mainPlayer, 0, mainPlayer.y);
                 playerWorldPos[0] += 1;
             }
             renderWorld();
