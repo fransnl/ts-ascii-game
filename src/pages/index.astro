@@ -8,55 +8,30 @@ import Layout from '../layouts/Layout.astro';
 	</main>
 </Layout>
 <script>
-    import {createNoise2D} from 'simplex-noise';
     import {player, updatePos, updateWorldPos} from '../player';
+    import {initWorld, renderWorld, renderMap} from '../world';
 
-    const noise2D = createNoise2D();
     const mainPlayer = player(400, 400, [20, 20]);
-
-    let height = 800/20;
-    let width = 800/20;
-
-    let world = new Array(height);
-    for(let i = 0; i < world.length; i++){
-       world[i] = new Array(width); 
-    }
-
-    for(let i = 0; i < height; i++){
-        for(let j = 0; j < width; j++){
-            let rx = i/width - 0.5;
-            let ry = j/height - 0.5;
-            let e = (noise2D(rx, ry)/2 + 0.5);
-            let m = (noise2D(rx, ry)/2 + 0.5)
-            world[i][j] = {e, m};
-        }
-    }
-
-    let grass = '#81a358';
-    let forest = '#476b3f';
-    let brown = '#a6745b';
-    let rock = '#909190';
-    let ocean = '#87b5ff';
-    let desert = '#fadfa5';
+    const worldObj = initWorld(800/20, 800/20); 
 
     let c = document.getElementById('game');
     let ctx = c.getContext("2d");
 
     function map(){
-        for(let i = 0; i < height; i++){
-            for(let j = 0; j < width; j++){
+        for(let i = 0; i < worldObj.height; i++){
+            for(let j = 0; j < worldObj.width; j++){
 
-                if(world[i][j].e < 0.1)
+                if(worldObj.world[i][j].e < 0.1)
                     ctx.fillStyle = ocean; 
-                if(world[i][j].e > 0.1)
+                if(worldObj.world[i][j].e > 0.1)
                     ctx.fillStyle = forest; 
-                    if(world[i][j].m > 0.3)
+                    if(worldObj.world[i][j].m > 0.3)
                         ctx.fillStyle = grass; 
-                if(world[i][j].e > 0.5)
+                if(worldObj.world[i][j].e > 0.5)
                     ctx.fillStyle = desert;
-                if(world[i][j].e > 0.7) 
+                if(worldObj.world[i][j].e > 0.7) 
                     ctx.fillStyle = rock; 
-                if(world[i][j].e > 0.9) 
+                if(worldObj.world[i][j].e > 0.9) 
                     ctx.fillStyle = '#ffffff'; 
                 if(mainPlayer.playerWorldPos[0] == i && mainPlayer.playerWorldPos[1] == j){
                     ctx.fillStyle = '#ff0022';
@@ -65,39 +40,16 @@ import Layout from '../layouts/Layout.astro';
             }
         }
     }
-    function renderWorld(){
-        loop:
-        for(let i = 0; i < height; i++){
-            for(let j = 0; j < width; j++){
 
-                if(world[i][j].e < 0.1)
-                    ctx.fillStyle = ocean; 
-                if(world[i][j].e > 0.1)
-                    ctx.fillStyle = forest; 
-                    if(world[i][j].m > 0.3)
-                        ctx.fillStyle = grass; 
-                if(world[i][j].e > 0.5)
-                    ctx.fillStyle = desert;
-                if(world[i][j].e > 0.7) 
-                    ctx.fillStyle = rock; 
-                if(world[i][j].e > 0.9) 
-                    ctx.fillStyle = '#ffffff'; 
-
-                if(mainPlayer.playerWorldPos[0] == i && mainPlayer.playerWorldPos[1] == j)
-                    break loop;
-            }
-        }
-        ctx.fillRect(0, 0, 800, 800);
-        
-    }
+    const brown = '#b0733e';
     function renderChar(){
         ctx.fillStyle = brown;
         ctx.fillRect(mainPlayer.x, mainPlayer.y, mainPlayer.playerWorldPos[0], mainPlayer.playerWorldPos[1]);
     } 
 
-    renderWorld();
+    renderWorld(ctx, worldObj, mainPlayer);
     renderChar();
-    map();
+    renderMap(ctx, worldObj, mainPlayer);
 
     addEventListener("keydown",(e) => {
         if(e.code === 'ArrowUp'){
@@ -106,9 +58,9 @@ import Layout from '../layouts/Layout.astro';
                 updatePos(mainPlayer, mainPlayer.x, 780);
                 updateWorldPos(mainPlayer, [mainPlayer.playerWorldPos[0], mainPlayer.playerWorldPos[1]-1]);
             }
-            renderWorld();
+            renderWorld(ctx, worldObj, mainPlayer);
             renderChar();
-            map();
+            renderMap(ctx, worldObj, mainPlayer);
         }
         if(e.code === 'ArrowDown'){
             updatePos(mainPlayer, mainPlayer.x, mainPlayer.y + 20);
@@ -116,9 +68,9 @@ import Layout from '../layouts/Layout.astro';
                 updatePos(mainPlayer, mainPlayer.x, 0);
                 updateWorldPos(mainPlayer, [mainPlayer.playerWorldPos[0], mainPlayer.playerWorldPos[1]+1]);
             }
-            renderWorld();
+            renderWorld(ctx, worldObj, mainPlayer);
             renderChar();
-            map();
+            renderMap(ctx, worldObj, mainPlayer);
         }
         if(e.code === 'ArrowLeft'){
             updatePos(mainPlayer, mainPlayer.x - 20, mainPlayer.y);
@@ -126,9 +78,9 @@ import Layout from '../layouts/Layout.astro';
                 updatePos(mainPlayer, 780, mainPlayer.y);
                 updateWorldPos(mainPlayer, [mainPlayer.playerWorldPos[0] - 1, mainPlayer.playerWorldPos[1]]);
             }
-            renderWorld();
+            renderWorld(ctx, worldObj, mainPlayer);
             renderChar();
-            map();
+            renderMap(ctx, worldObj, mainPlayer);
         }
         if(e.code === 'ArrowRight'){
             updatePos(mainPlayer, mainPlayer.x + 20, mainPlayer.y);
@@ -136,9 +88,9 @@ import Layout from '../layouts/Layout.astro';
                 updatePos(mainPlayer, 0, mainPlayer.y);
                 updateWorldPos(mainPlayer, [mainPlayer.playerWorldPos[0] + 1, mainPlayer.playerWorldPos[1]]);
             }
-            renderWorld();
+            renderWorld(ctx, worldObj, mainPlayer);
             renderChar();
-            map();
+            renderMap(ctx, worldObj, mainPlayer);
         }
     });
 
