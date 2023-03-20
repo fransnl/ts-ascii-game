@@ -44,7 +44,7 @@ import Layout from '../layouts/Layout.astro';
     const brown = '#b0733e';
     function renderChar(){
         ctx.fillStyle = brown;
-        ctx.fillRect(mainPlayer.x, mainPlayer.y, mainPlayer.playerWorldPos[0], mainPlayer.playerWorldPos[1]);
+        ctx.fillRect(mainPlayer.x, mainPlayer.y, 20, 20);
     } 
 
     renderWorld(ctx, worldObj, mainPlayer);
