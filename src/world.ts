@@ -24,7 +24,7 @@ export function initWorld(height:number, width: number): world{
         for(let j = 0; j < width; j++){
             let rx = i/width - 0.5;
             let ry = j/height - 0.5;
-            let e = (noise2D(rx, ry)/2 + 0.5);
+            let e = Math.round((noise2D(rx, ry)/2 + 0.5)*12)/12;
             let m = (noise2D(rx, ry)/2 + 0.5)
             w[i][j] = {e, m};
         }
@@ -59,7 +59,6 @@ export function renderWorld(ctx: any, worldObj: world, mainPlayer: any){
         }
     }
     ctx.fillRect(0, 0, 800, 800);
-    
 }
 
 export function renderMap(ctx: any, worldObj: world, mainPlayer: any){
@@ -81,7 +80,7 @@ export function renderMap(ctx: any, worldObj: world, mainPlayer: any){
             if(mainPlayer.playerWorldPos[0] == i && mainPlayer.playerWorldPos[1] == j){
                 ctx.fillStyle = '#ff0022';
             }
-            ctx.fillRect(i*4, j*4, 4, 4);
+            ctx.fillRect(i*2, j*2, 2, 2);
         }
     }
 }

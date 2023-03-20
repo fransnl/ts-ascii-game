@@ -12,7 +12,7 @@ import Layout from '../layouts/Layout.astro';
     import {initWorld, renderWorld, renderMap} from '../world';
 
     const mainPlayer = player(400, 400, [20, 20]);
-    const worldObj = initWorld(800/20, 800/20); 
+    const worldObj = initWorld(800/10, 800/10); 
 
     let c = document.getElementById('game');
     let ctx = c.getContext("2d");
@@ -44,7 +44,7 @@ import Layout from '../layouts/Layout.astro';
     const brown = '#b0733e';
     function renderChar(){
         ctx.fillStyle = brown;
-        ctx.fillRect(mainPlayer.x, mainPlayer.y, 20, 20);
+        ctx.fillRect(mainPlayer.x, mainPlayer.y, 10, 10);
     } 
 
     renderWorld(ctx, worldObj, mainPlayer);
